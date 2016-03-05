@@ -1,0 +1,174 @@
+---
+title: "Homework6"
+author: "Rohan Sadale"
+date: "1 March 2016"
+output: pdf_document
+---
+
+```{r}
+library(alr4)
+```
+
+
+#### 5.2
+
+Equation 5.6 is -
+
+$$E(lifeExpF|log(ppgpd) = x, group = j) = \eta_{0j} + \eta_{1j}x\\$$
+
+Equation 5.7 is 
+
+$$E(lifeExpF|log(ppgpd) = x, group) = \beta_0 + \beta_{02}U_2 + \beta_{03}U_3 + \beta_1x + \beta_{12}U_2x + \beta_{13}U_3x$$ 
+
++ Now in equation 5.6 and 5.7, if we set group = 1 then $U_2=0$ and $U_3=0$ and 
+
+$$E(lifeExpF|log(ppgpd) = x, group = 1) = \eta_{01} + \eta_{11}x\\$$
+$$E(lifeExpF|log(ppgpd) = x, group = 1) = \beta_0 + \beta_1x $$
+
+Thus we can see that ,
+$\eta_{01}$ = $\beta_0$ and $\eta_{11}$ = $\beta_1$
+
++ Now in equation 5.6 and 5.7, if we set group = 2 then $U_3=0$ and 
+
+$$E(lifeExpF|log(ppgpd) = x, group = 2) = \eta_{02} + \eta_{12}x\\$$
+$$E(lifeExpF|log(ppgpd) = x, group = 2) = \beta_0 + \beta_{02}U_2 + \beta_1x + \beta_{12}U_2x $$
+
+Thus we can see that, 
+$\eta_{02}$ = $\beta_0 + \beta_{02}U_2$ and $\eta_{12}$ = $\beta_1 + \beta_{12}U_2$
+
++ Similarly, in equation 5.6 and 5.7, if we set group = 3 then $U_2=0$ and 
+
+$$E(lifeExpF|log(ppgpd) = x, group = 2) = \eta_{03} + \eta_{13}x\\$$
+$$E(lifeExpF|log(ppgpd) = x, group = 2) = \beta_0 + \beta_{03}U_3 + \beta_1x + \beta_{13}U_3x $$
+
+Thus we can see that, 
+$\eta_{03}$ = $\beta_0 + \beta_{03}U_3$ and $\eta_{13}$ = $\beta_1 + \beta_{13}U_3$ 
+
+
+#### 5.4
+
+##### 5.4.1
+```{r}
+boxplot(log(acrePrice) ~ year, MinnLand)
+```
+
+From the box-plot we can see that - 
+
++ The farm sales in each year seems increasing steadily.
++ The pattern that housing prices were increasing in US from 2002-2006 and then decreasing from 2007 is not observed in this data. The trend for MinnLand seems increasing from 2002-2007 and from 2008 onwards the rate of increase is slightly less as compared to previous.
++ Also we can see that the there is no relationship between interquantile ranges in each successive years.
+
+##### 5.4.2
+```{r}
+MinnLand$fyear = as.factor(MinnLand$year)
+m1 = lm(log(acrePrice)~fyear, data=MinnLand)
+summary(m1)
+```
+
+From the summary above we can say that,
+
++ The intercept represents year 2002.
++ All the estimates of slope from the summary (fyear2003 to fyear2011) are actually the difference between estimates of year 2002 and respective year.
++ From t-statistics, we can interpret that the change in log(acrePrice) from 2002 to 2003 is not significant while the change in log(acrePrice) from 2002 to other years seem significant.
+
+
+##### 5.4.3
+
+```{r}
+MinnLand$fyear = as.factor(MinnLand$year)
+m1 = lm(log(acrePrice)~fyear-1, data=MinnLand)
+
+with(MinnLand, tapply(log(acrePrice), fyear, mean))
+coefficients(m1)
+```
+
+From above summary we can see that parameter estimates of model without intercept are equal to means of log(acrePrice) for each year.
+
+```{r}
+with(MinnLand, tapply(log(acrePrice), fyear, function(x) sd(x)/sqrt(length(x))))
+summary(m1)
+```
+
+The difference is because while fitting regression model we consider constant variance for all y values where as with the above tapply function we would consider variance across years
+
+
+#### 5.8
+
+##### 5.8.1
+
+```{r}
+m1 <- lm(Y ~ X1 + X2 + I(X1^2) + I(X2^2) + X1:X2, cakes)
+summary(m1)
+```
+
+From the summary we can see that significance levels for quadratic and interaction terms are less than 0.005.
+
+##### 5.8.2
+
+```{r}
+m1 <- lm(Y ~ as.factor(block) + X1 + X2 + I(X1^2) + I(X2^2) + X1:X2, cakes)
+summary(m1)
+
+m1 <- lm(Y ~ as.factor(block) + X1 + X2 + I(X1^2) + I(X2^2) + X1:X2 - 1, cakes)
+summary(m1)
+```
+
+From the summary we can see that each block has same effect on the response.
+
+
+#### 5.10
+
+##### 5.10.1
+
++ In model (a) the change in log(acrePrice) depends only on year and is independent of region. Whereas in model(b), the change is log(acrePrice) depends on both year and region.
+
+##### 5.10.2
+
+```{r}
+m1 <- lm(log(acrePrice) ~ fyear + region + fyear*region, MinnLand)
+#m1 <- lm(log(acrePrice) ~ region*fyear, MinnLand)
+summary(m1)
+plot(allEffects(m1))
+plot(allEffects(m1), multiline = TRUE)
+```
+
+From the effects plot we can see that prices in Northwest regions always lie lower that other region. The prices in all regions are increasing. Also we can see the interaction is present.
+
+#### 5.11
+
+##### 5.11.1
+
+```{r}
+m1 <- lm(log(acrePrice) ~ fyear + region + fyear*region + financing, MinnLand)
+confint(m1, level = 0.95)["financingseller_financed",]
+```
+
+The negative sign suggest that seller_financed sales are lower than title_transfer sales. The seller financed sales estimated between 11% lower and 7% lower.
+
+##### 5.11.2
+
++ This is observational data and we can infer only correlation from it. But the first statement implies causation which is not supported by observational data.
++ The second statement seems true for the data but doesn't support strongly for all cases.
+
+#### 5.14
+
+##### 5.14.1
+```{r}
+plot(HT18 ~ HT9, pch=ifelse(Sex=="0",1,2), BGSall)
+```
+
+The appropriate mean functions for boys and girls if taken seperately seem parallel to each other.
+
+##### 5.14.2
+
+```{r}
+m1 <- lm(HT18~HT9 + Sex + HT9:Sex, data=BGSall)
+summary(m1)
+plot(allEffects(m1), multiline = TRUE)
+confint(m1, level = 0.95)["Sex",]
+
+m1 <- lm(HT18~HT9 + Sex, data=BGSall)
+confint(m1, level = 0.95)["Sex",]
+```
+
+From the t-statistics of the interaction we can see that it is close to zero. Thus we can say they support parallel regression model.

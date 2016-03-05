@@ -1,0 +1,175 @@
+---
+title: "Homework 4"
+author: "Rohan Sadale"
+date: "18 Feb 2016"
+output: html_document
+---
+
+```{r message=FALSE}
+library(alr4)
+```
+
+
+#### 3.3
+
+
+##### 3.3.1
+
+
+```{r}
+onlyGirls <- subset(BGSall, BGSall$Sex==1)
+plot(~ HT2 + WT2 + WT9 + HT9 + ST9 + BMI18, onlyGirls)
+```
+
+From the plot we can observe that HT2, WT2, WT9, HT9 and ST9 are correlated with each other and we can fit a simple linear regression line between these pairs. However this is not the case with BMI18. BMI18 doesn't seem to be correlated with any predictors except a very weak correlation with WT9. 
+
+We can see that the graph is a bit difficult to interpret because the points appear to be clustered. This is due to girl with BMI above 35. So let's us remove the data point and see if we can improve our inference from scatterplot.
+
+```{r}
+onlyGirls1 <- subset(onlyGirls, onlyGirls$BMI18 < 35)
+plot(~ HT2 + WT2 + WT9 + HT9 + ST9 + BMI18, onlyGirls1)
+```
+
+Now we can see correlation between WT9 and BMI18, but the correlation between BMI18 and rest other predictors is almost similar.
+
+
+```{r}
+cor(onlyGirls[, c("HT2", "WT2", "HT9", "WT9", "ST9", "BMI18")])
+#Without girl with BMI > 35
+cor(onlyGirls1[, c("HT2", "WT2", "HT9", "WT9", "ST9", "BMI18")])
+```
+
+From the correlation matrix we can see that most of the information summarized above for the plot holds true. Also from the last column of the matrix we can see very weak correlation of predictors with BMI18. Only WT9 has a better correlation with BMI18.
+
+
+##### 3.3.2
+
+```{r}
+m1 <- lm(BMI18 ~ WT9, onlyGirls)
+m2 <- lm(ST9 ~ WT9, onlyGirls)
+m3 <- lm(residuals(m1)~residuals(m2))
+plot(residuals(m1)~residuals(m2))
+abline(m3)
+```
+
+The added variable plot for ST9 after WT9 shows that after adjustment BMI18 and ST9 are negatively related. This may be due to the presence of the outlier which creates the negative correlation. So if we delete the outlier, we get below plot - 
+
+```{r}
+onlyGirls1 <- subset(onlyGirls, onlyGirls$BMI18 < 35)
+m1 <- lm(BMI18 ~ WT9, onlyGirls1)
+m2 <- lm(ST9 ~ WT9, onlyGirls1)
+m3 <- lm(residuals(m1)~residuals(m2))
+plot(residuals(m1)~residuals(m2))
+abline(m3)
+```
+
+Though there is still negative correlation, but it's weak as compared to previous plot.
+
+
+##### 3.3.3
+
+```{r}
+m1 <- lm(BMI18 ~ HT2 + WT2 + WT9 + HT9 + ST9, onlyGirls)
+summary(m1)
+```
+
+From the summary we can see R-squared is 0.443 which says that the regression explains 44.3% of variation in BMI. 
+
+The hypothesis tested by the t-values are that each of the slope values(HT2, WT2, WT9, HT9, ST9) = 0 with other slope values arbitary vs. slope value != 0 with other slope values arbitrary.
+
+Also we can see that only WT9 and ST9 have p-value below 0.05 which says that these are the only variables that can explain the variation in BMI.
+
+
+#### 3.6
+
+##### 3.6.1
+
+```{r}
+plot(~OPBPC + OPRC + OPSLAKE + BSAAM, water)
+cor(water[,c("OPBPC", "OPRC", "OPSLAKE", "BSAAM")])
+```
+
+From the plot, we can see all the predictors - OPBPC, OPRC, OPSLAKE are strongly correlated with each other and also strongly correlated with the response variable - BSAAM. We can see that OPBPC has stongest correlation with OPSLAKE and lowest with OPRC. OPRC has strongest correlation with BSAAM and lowest correlation with OPBPC. OPBPC has strongest correlation with OPBC and lowest with OPRC. Of all the predictors, we can see that OPSLAKE seems to be strongly correlated with other variables.
+
+The same inference we can make from the correlation matrix.
+
+
+##### 3.6.2
+
+```{r}
+m1 <- lm(BSAAM ~ OPBPC + OPRC + OPSLAKE, water)
+summary(m1)
+```
+
+The hypothesis tested by the t-values are that each of the slope values(OPBPC, OPRC, OPSLAKE) = 0 with other slope values arbitary vs. slope value != 0 with other slope values arbitrary.From the p-values we can see that OPRC and OPSLAKE have significant level less that 0.05 which indicates that if we add them to the regression model we can better explain the variation in response BSAAM.
+
+
+#### 4.1
+
+```{r}
+m1 <- lm(BMI18 ~ WT2 + WT9 + WT18, BGSgirls) 
+summary(m1)
+
+ave <- (BGSgirls$WT2 + BGSgirls$WT9 + BGSgirls$WT18)/3
+lin <- BGSgirls$WT18 - BGSgirls$WT2
+quad <- BGSgirls$WT2 - 2*BGSgirls$WT9 + BGSgirls$WT18
+
+m2 <- lm(BMI18 ~ ave + lin + quad, BGSgirls)
+summary(m2)
+```
+
+From the plot we can see - 
+
++ The coefficient of determination is same in both models.
++ All residuals are identical
++ Intercepts are same
++ From the first model we can see that BMI depends on WT2 and WT18. In the second mode we can see that BMI depends on lin i.e. linear combination of WT18 and WT2. The interpretation in transformed scale seems easier as only linear time is significant in explaining BMI. Thus, we can describe the change in BMI over time as increasing by the same amount each year.
+
+
+#### 4.2
+
+
+```{r}
+a <- (Transact$t1 + Transact$t2)/2
+d <- (Transact$t1 - Transact$t2)
+
+m1 <- lm(time ~ t1+t2, Transact)
+m2 <- lm(time ~ a+d, Transact)
+m3 <- lm(time~ t2+d, Transact)
+m4 <- lm(time~ t1 + t2 + a + d, Transact)
+
+# Model 1
+summary(m1)
+
+# Model 2
+summary(m2)
+
+# Model 3
+summary(m3)
+
+# Model 4
+summary(m4)
+```
+
+
+##### 4.2.1
+
++ While fitting model m4, the variability in time is explained by t1 and t2. Thus, while building model, when a and d are encountered, they aren't able to provide any additional information in explaining time. This is because a and d are linear combination of t1 and t2. Thus, a and d are marked as NA in the summary table.
+
+
+##### 4.2.2
+
+From the summary statistics we can see - 
+
++ The coefficient of determination is same in all models.
++ All residuals are identical
++ Intercepts are same
++ Degrees of freedom are same
++ Slopes are different.
++ t-values and p-values are different
++ Standard errors are different
+
+
+##### 4.2.3
+
++ The coefficient of t2 is different in models 1 and 3 because, in model 1 it represents change in time keeping t1 as constant. On the other hand, in model 3, it represents change in time keeping d as constant. As d = t1 - t2, it kind of puts a restriction on how t2 can change which also cause the response to changes.
