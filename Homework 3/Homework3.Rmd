@@ -1,7 +1,7 @@
 ---
 title: "Homework 3"
 author: "Rohan Sadale"
-output: html_document
+output: pdf_document
 ---
 
 

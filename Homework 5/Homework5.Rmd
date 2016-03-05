@@ -1,8 +1,8 @@
 ---
 title: "Homework5"
-author: Rohan Sadale
-date: 24 February 2016
-output: html_document
+author: "Rohan Sadale"
+date: "24 February 2016"
+output: pdf_document
 ---
 
 ```{r message=FALSE}

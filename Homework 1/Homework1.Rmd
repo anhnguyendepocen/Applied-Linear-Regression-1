@@ -1,9 +1,8 @@
 ---
 title: "Homework1"
 author: "Rohan Sadale"
-output: html_document
 date: "Jan 28, 2016"
-
+output: pdf_document
 ---
 ```{r, message=FALSE}
 library(alr4)

@@ -2,7 +2,7 @@
 title: "Homework 4"
 author: "Rohan Sadale"
 date: "18 Feb 2016"
-output: html_document
+output: pdf_document
 ---
 
 ```{r message=FALSE}
