@@ -1,0 +1,122 @@
+---
+title: "Homework7"
+author: "Rohan Sadale"
+date: "March 10, 2016"
+output: pdf_document
+---
+
+```{r}
+library(alr4)
+```
+
+### 6.1
+
+```{r}
+m1 <- lm(lifeExpF ~ 1, UN11)
+m2 <- lm(lifeExpF ~ group, UN11)
+anova(m1, m2)
+```
+
+The summary shows that p-value is almost 0. Thus group should not be removed.
+
+### 6.2
+
+For F-tests to be done, NH should be special case of AH (such as setting one of the $\beta$ parameter to zero). 
+
+### 6.3
+
+```{r}
+m1 <- lm(lifeExpF ~ group, UN11)
+m2 <- lm(lifeExpF ~ group + log(ppgdp), UN11)
+anova(m1, m2)
+```
+
+The summary says that as p-value is almost 0, we should not remove log(ppgdp).
+
+### 6.4
+
+#### 6.4.1 
+
+Common intercept and different slopes in each group. The absence of group removes all the different intercepts.
+
+#### 6.4.2
+
+```{r}
+m1 <- lm(lifeExpF ~ log(ppgdp) + group:log(ppgdp), UN11)
+m2 <- lm(lifeExpF ~ group + log(ppgdp) + group:log(ppgdp), UN11)
+anova(m1, m2)
+```
+
+As p-value isn't 0, we should remove the interaction term.
+
+### 6.5
+
+#### 6.5.1
+
+```{r}
+m1 <- lm(lifeExpF ~ group + log(ppgdp), UN11)
+summary(m1)
+```
+
+From the p-value of groupother we can say that it isn't significantly different from the intercept(which is in this case oecd)
+
+
+#### 6.5.2
+
+```{r}
+linearHypothesis(m1, "groupother - groupafrica")
+```
+
+From the p-value we can say that intercept of other and africa aren't different.
+
+### 6.6
+
+```{r}
+data(fuel2001)
+fuel2001$Dlic = 1000*fuel2001$Drivers/fuel2001$Pop
+fuel2001$Fuel = 1000*fuel2001$FuelC/fuel2001$Pop
+fuel2001$Income = fuel2001$Income/1000
+
+m1 <- lm(Fuel ~ 1, fuel2001)
+m2 <- lm(Fuel ~ Tax+Dlic+Income+log(Miles), fuel2001)
+anova(m2, m1)
+```
+
+From the summary we can say that model with all the regressors has p-value of almost 0 (significant). Thus we don't need to do any futher testing such as removing regressors.
+
+### 6.7
+
+#### 6.7.1
+
+```{r}
+data(fuel2001)
+fuel2001$Dlic = 1000*fuel2001$Drivers/fuel2001$Pop
+fuel2001$Fuel = 1000*fuel2001$FuelC/fuel2001$Pop
+fuel2001$Income = fuel2001$Income/1000
+
+m1 <- lm(Fuel ~ Tax+Dlic+Income+log(Miles), fuel2001)
+m2 <- lm(Fuel ~ log(Miles)+Tax+Dlic+Income, fuel2001)
+
+anova(m1)
+anova(m2)
+```
+
+As anova() provides tests in sequential order, there is difference between the anova for m1 and m2.
+
+
+#### 6.7.2
+
+```{r}
+data(fuel2001)
+fuel2001$Dlic = 1000*fuel2001$Drivers/fuel2001$Pop
+fuel2001$Fuel = 1000*fuel2001$FuelC/fuel2001$Pop
+fuel2001$Income = fuel2001$Income/1000
+
+m1 <- lm(Fuel ~ Tax+Dlic+Income+log(Miles), fuel2001)
+m2 <- lm(Fuel ~ log(Miles)+Tax+Dlic+Income, fuel2001)
+
+Anova(m1)
+Anova(m2)
+```
+
+The regressors which are added at the last in Type 1 anova have same estimates as respective those in Type 2 anova. 
